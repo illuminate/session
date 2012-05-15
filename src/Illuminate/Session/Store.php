@@ -125,6 +125,16 @@ abstract class Store {
 	}
 
 	/**
+	 * Create a cookie instance for the session.
+	 *
+	 * @return Symfony\Component\HttpFoundation\Cookie
+	 */
+	protected function createCookie()
+	{
+		// @todo
+	}
+
+	/**
 	 * Get the current session ID.
 	 *
 	 * @return string

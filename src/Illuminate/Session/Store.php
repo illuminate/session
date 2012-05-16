@@ -394,6 +394,17 @@ abstract class Store implements ArrayAccess {
 	}
 
 	/**
+	 * Set the entire session payload.
+	 *
+	 * @param  array  $session
+	 * @return void
+	 */
+	public function setSession($session)
+	{
+		$this->session = $session;
+	}
+
+	/**
 	 * Get the current session ID.
 	 *
 	 * @return string

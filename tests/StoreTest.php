@@ -54,6 +54,32 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testBasicPayloadManipulation()
+	{
+		$store = $this->storeMock('isInvalid');
+		$request = Request::create('/', 'GET', array(), array('illuminate_session' => 'foo'));
+		$store->expects($this->once())->method('isInvalid')->will($this->returnValue(true));
+		$store->start($request);
+
+		$store->put('foo', 'bar');
+		$this->assertEquals('bar', $store->get('foo'));
+		$this->assertTrue($store->has('foo'));
+		$store->forget('foo');
+		$this->assertFalse($store->has('foo'));
+		$this->assertEquals('taylor', $store->get('bar', 'taylor'));
+		$this->assertEquals('taylor', $store->get('bar', function() { return 'taylor'; }));
+	}
+
+
+	public function testFlashDataCanBeRetrieved()
+	{
+		$store = $this->storeMock();
+		$store->setSession(array('id' => '1', 'data' => array(':new:' => array('foo' => 'bar'), ':old:' => array('baz' => 'boom'))));
+		$this->assertEquals('bar', $store->get('foo'));
+		$this->assertEquals('boom', $store->get('baz'));
+	}
+
+
 	protected function dummySession()
 	{
 		return array('id' => '123', 'data' => array(':old:' => array(), ':new:' => array()), 'last_activity' => '9999999999');

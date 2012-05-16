@@ -100,7 +100,7 @@ abstract class Store implements ArrayAccess {
 		{
 			$this->exists = false;
 
-			$session = $this->createSession();
+			$session = $this->createFreshSession();
 		}
 
 		// Once the session payload has been created or loaded we will set it
@@ -114,7 +114,7 @@ abstract class Store implements ArrayAccess {
 	 *
 	 * @return array
 	 */
-	protected function createSession()
+	protected function createFreshSession()
 	{
 		$flash = $this->createData();
 

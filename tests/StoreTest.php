@@ -59,7 +59,6 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 	{
 		$store = $this->storeMock('isInvalid');
 		$request = Request::create('/', 'GET', array(), array('illuminate_session' => 'foo'));
-		$store->expects($this->once())->method('isInvalid')->will($this->returnValue(true));
 		$store->start($request);
 
 		$store->put('foo', 'bar');

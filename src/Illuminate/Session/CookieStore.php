@@ -44,7 +44,7 @@ class CookieStore extends Store {
 
 		if ( ! is_null($value))
 		{
-			return unserialize($this->encrypter->decrypt($value));
+			return @unserialize($this->encrypter->decrypt($value));
 		}
 	}
 

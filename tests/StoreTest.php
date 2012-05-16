@@ -100,6 +100,16 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testKeepMethod()
+	{
+		$store = $this->storeMock();
+		$store->setSession(array('id' => '1', 'data' => array(':new:' => array(), ':old:' => array('foo' => 'bar', 'baz' => 'boom'))));
+		$store->keep(array('foo'));
+		$session = $store->getSession();
+		$this->assertEquals(array('foo' => 'bar'), $session['data'][':new:']);
+	}
+
+
 	public function testArrayAccess()
 	{
 		$store = $this->storeMock();

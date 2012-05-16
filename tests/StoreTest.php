@@ -16,6 +16,22 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testInvalidSessionCreatesFresh()
+	{
+		$store = $this->storeMock('isInvalid');
+		$session = $this->dummySession();
+		$request = Request::create('/', 'GET', array(), array('illuminate_session' => 'foo'));
+		$store->expects($this->once())->method('retrieveSession')->with($this->equalTo('foo'))->will($this->returnValue($session));
+		$store->expects($this->once())->method('isInvalid')->with($this->equalTo($session))->will($this->returnValue(true));
+		$store->start($request);
+
+		$session = $store->getSession();
+		$this->assertFalse($store->sessionExists());
+		$this->assertTrue(strlen($session['id']) == 40);
+		$this->assertFalse(isset($session['last_activity']));	
+	}
+
+
 	protected function dummySession()
 	{
 		return array('id' => '123', 'data' => array(':old:' => array(), ':new:' => array()), 'last_activity' => '9999999999');

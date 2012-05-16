@@ -414,6 +414,16 @@ abstract class Store implements ArrayAccess {
 	}
 
 	/**
+	 * Determine if the session exists in storage.
+	 *
+	 * @return bool
+	 */
+	public function sessionExists()
+	{
+		return $this->exists;
+	}
+
+	/**
 	 * Get the session cookie name.
 	 *
 	 * @return string

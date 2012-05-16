@@ -28,7 +28,29 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 		$session = $store->getSession();
 		$this->assertFalse($store->sessionExists());
 		$this->assertTrue(strlen($session['id']) == 40);
-		$this->assertFalse(isset($session['last_activity']));	
+		$this->assertFalse(isset($session['last_activity']));
+	}
+
+
+	public function testOldSessionsAreConsideredInvalid()
+	{
+		$store = $this->storeMock('createFreshSession');
+		$request = Request::create('/', 'GET', array(), array('illuminate_session' => 'foo'));
+		$session = $this->dummySession();
+		$session['last_activity'] = '1111111111';
+		$store->expects($this->once())->method('retrieveSession')->with($this->equalTo('foo'))->will($this->returnValue($session));
+		$store->expects($this->once())->method('createFreshSession');
+		$store->start($request);
+	}
+
+
+	public function testNullSessionsAreConsideredInvalid()
+	{
+		$store = $this->storeMock('createFreshSession');
+		$request = Request::create('/', 'GET', array(), array('illuminate_session' => 'foo'));
+		$store->expects($this->once())->method('retrieveSession')->with($this->equalTo('foo'))->will($this->returnValue(null));
+		$store->expects($this->once())->method('createFreshSession');
+		$store->start($request);
 	}
 
 

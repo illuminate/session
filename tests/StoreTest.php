@@ -1,6 +1,7 @@
 <?php
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class StoreTest extends PHPUnit_Framework_TestCase {
 
@@ -9,7 +10,7 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 		$store = $this->storeMock('isInvalid');
 		$session = $this->dummySession();
 		$request = Request::create('/', 'GET', array(), array('illuminate_session' => 'foo'));
-		$store->expects($this->once())->method('retrieveSession')->with($this->equalTo('foo'))->will($this->returnValue($session));
+		$store->expects($this->once())->method('retrieveSession')->with($this->equalTo('foo'), $this->equalTo($request))->will($this->returnValue($session));
 		$store->expects($this->once())->method('isInvalid')->with($this->equalTo($session))->will($this->returnValue(false));
 		$store->start($request);
 		$this->assertEquals($session, $store->getSession());
@@ -21,7 +22,7 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 		$store = $this->storeMock('isInvalid');
 		$session = $this->dummySession();
 		$request = Request::create('/', 'GET', array(), array('illuminate_session' => 'foo'));
-		$store->expects($this->once())->method('retrieveSession')->with($this->equalTo('foo'))->will($this->returnValue($session));
+		$store->expects($this->once())->method('retrieveSession')->with($this->equalTo('foo'), $this->equalTo($request))->will($this->returnValue($session));
 		$store->expects($this->once())->method('isInvalid')->with($this->equalTo($session))->will($this->returnValue(true));
 		$store->start($request);
 
@@ -150,7 +151,7 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 		$session['last_activity'] = 1;
 		$session['data'] = array(':old:' => array('baz' => 'boom'), ':new:' => array());
 		$store->expects($this->once())->method('updateSession')->with($this->equalTo('1'), $this->equalTo($session));
-		$response = new Symfony\Component\HttpFoundation\Response;
+		$response = new Response;
 		$store->finish($response);
 	}
 
@@ -164,7 +165,7 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 		$session['data'] = array(':old:' => array('baz' => 'boom'), ':new:' => array());
 		$store->expects($this->once())->method('createSession')->with($this->equalTo('1'), $this->equalTo($session));
 		$store->setExists(false);
-		$response = new Symfony\Component\HttpFoundation\Response;
+		$response = new Response;
 		$store->finish($response);	
 	}
 
@@ -173,7 +174,7 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 	{
 		$store = $this->storeMock('getCurrentTime');
 		$store->setSession($session = array('id' => '1', 'data' => array(':old:' => array('foo' => 'bar'), ':new:' => array('baz' => 'boom'))));
-		$response = new Symfony\Component\HttpFoundation\Response;
+		$response = new Response;
 		$store->expects($this->any())->method('getCurrentTime')->will($this->returnValue(1));
 		$store->setCookieOption('path', '//');
 		$store->setCookieOption('domain', 'foo.com');
@@ -230,47 +231,21 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 
 class SweeperStub extends Illuminate\Session\Store implements Illuminate\Session\Sweeper {
 
-	/**
-	 * Retrieve a session payload from storage.
-	 *
-	 * @param  string      $id
-	 * @return array|null
-	 */
-	protected function retrieveSession($id)
+	protected function retrieveSession($id, Request $request)
 	{
 		//
 	}
 
-	/**
-	 * Create a new session in storage.
-	 *
-	 * @param  string  $id
-	 * @param  array   $session
-	 * @return void
-	 */
-	protected function createSession($id, array $session)
+	protected function createSession($id, array $session, Response $response)
 	{
 		//
 	}
 
-	/**
-	 * Update an existing session in storage.
-	 *
-	 * @param  string  $id
-	 * @param  array   $session
-	 * @return void
-	 */
-	protected function updateSession($id, array $session)
+	protected function updateSession($id, array $session, Response $response)
 	{
 		//
 	}
 
-	/**
-	 * Remove session records older than a given expiration.
-	 *
-	 * @param  int   $expiration
-	 * @return void
-	 */
 	public function sweep($expiration)
 	{
 		//

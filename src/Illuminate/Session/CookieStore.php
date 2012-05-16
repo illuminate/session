@@ -3,24 +3,31 @@
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class CacheDrivenStore extends Store {
+class CookieStore extends Store {
 
 	/**
-	 * The cache store instance.
+	 * The Illuminate encrypter instance.
 	 *
-	 * @var Illuminate\Cache\Store
+	 * @var Illuminate\Encrypter
 	 */
-	protected $cache;
+	protected $encrypter;
 
 	/**
-	 * Create a new Memcache session instance.
+	 * The name of the session payload cookie.
 	 *
-	 * @param  Illuminate\Cache\Store  $cache
+	 * @var string
+	 */
+	protected $payload = 'illuminate_payload';
+
+	/**
+	 * Create a new Cookie based session store.
+	 *
+	 * @param  Illuminate\Encrypter  $encrypter
 	 * @return void
 	 */
-	public function __construct(\Illuminate\Cache\Store $cache)
+	public function __construct(Encrypter $encrypter)
 	{
-		$this->cache = $cache;
+		$this->encrypter = $encrypter;
 	}
 
 	/**
@@ -32,7 +39,12 @@ class CacheDrivenStore extends Store {
 	 */
 	protected function retrieveSession($id, Request $request)
 	{
-		return $this->cache->get($id);
+		$value = $request->cookies->get($this->payload);
+
+		if ( ! is_null($value))
+		{
+			return unserialize($this->encrypter->decrypt($value));
+		}
 	}
 
 	/**
@@ -45,7 +57,9 @@ class CacheDrivenStore extends Store {
 	 */
 	protected function createSession($id, array $session, Response $response)
 	{
-		$this->cache->forever($id, serialize($session));
+		$value = $this->encrypter->encrypt(serialize($session));
+
+		$response->headers->setCookie($this->createCookie($value));
 	}
 
 	/**
@@ -58,7 +72,18 @@ class CacheDrivenStore extends Store {
 	 */
 	protected function updateSession($id, array $session, Response $response)
 	{
-		return $this->createSession($id, $session);
+		return $this->createSession($id, $session, $response);
+	}
+
+	/**
+	 * Set the name of the sessoin payload cookie.
+	 *
+	 * @param  string  $name
+	 * @return void
+	 */
+	public function setPayloadName($name)
+	{
+		$this->paylaod = $name;
 	}
 
 }

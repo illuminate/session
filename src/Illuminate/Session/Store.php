@@ -52,28 +52,31 @@ abstract class Store implements ArrayAccess {
 	/**
 	 * Retrieve a session payload from storage.
 	 *
-	 * @param  string      $id
+	 * @param  string                                    $id
+	 * @param  Symfony\Component\HttpFoundation\Request  $request
 	 * @return array|null
 	 */
-	abstract protected function retrieveSession($id);
+	abstract protected function retrieveSession($id, Request $request);
 
 	/**
 	 * Create a new session in storage.
 	 *
-	 * @param  string  $id
-	 * @param  array   $session
+	 * @param  string                                     $id
+	 * @param  array                                      $session
+	 * @param  Symfony\Component\HttpFoundation\Response  $response
 	 * @return void
 	 */
-	abstract protected function createSession($id, array $session);
+	abstract protected function createSession($id, array $session, Response $response);
 
 	/**
 	 * Update an existing session in storage.
 	 *
-	 * @param  string  $id
-	 * @param  array   $session
+	 * @param  string                                     $id
+	 * @param  array                                      $session
+	 * @param  Symfony\Component\HttpFoundation\Response  $response
 	 * @return void
 	 */
-	abstract protected function updateSession($id, array $session);
+	abstract protected function updateSession($id, array $session, Response $response);
 
 	/**
 	 * Load the session for the request.
@@ -90,7 +93,7 @@ abstract class Store implements ArrayAccess {
 		// session on validity. All data fetching is driver implemented.
 		if ( ! is_null($id))
 		{
-			$session = $this->retrieveSession($id);
+			$session = $this->retrieveSession($id, $request);
 		}
 
 		// If the session is not valid, we will create a new payload and will
@@ -316,11 +319,11 @@ abstract class Store implements ArrayAccess {
 		// the same code regardless of whether the session is new or not.
 		if ($this->exists)
 		{
-			$this->updateSession($id, $this->session);
+			$this->updateSession($id, $this->session, $response);
 		}
 		else
 		{
-			$this->createSession($id, $this->session);
+			$this->createSession($id, $this->session, $response);
 		}
 
 		// If the driver implements the Sweeper interface and hits the sweeper
@@ -331,7 +334,7 @@ abstract class Store implements ArrayAccess {
 			$this->sweep($time - ($this->lifetime * 60));
 		}
 
-		$response->headers->setCookie($this->createCookie());
+		$response->headers->setCookie($this->createCookie($id));
 	}
 
 	/**
@@ -369,16 +372,12 @@ abstract class Store implements ArrayAccess {
 	/**
 	 * Create a cookie instance for the session.
 	 *
+	 * @param  string  $value
 	 * @return Symfony\Component\HttpFoundation\Cookie
 	 */
-	protected function createCookie()
+	protected function createCookie($value)
 	{
 		$expiration = $this->getCurrentTime() + ($this->lifetime * 60);
-
-		// The value of the cookie will be set to the current session ID as
-		// that will allow us identify the session on subsequent requests
-		// to the application since we can look-up the payloads by IDs.
-		$value = $this->getSessionID();
 
 		return $this->buildCookie($value, $expiration);
 	}

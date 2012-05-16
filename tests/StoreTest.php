@@ -231,17 +231,17 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 
 class SweeperStub extends Illuminate\Session\Store implements Illuminate\Session\Sweeper {
 
-	protected function retrieveSession($id, Request $request)
+	public function retrieveSession($id, Request $request)
 	{
 		//
 	}
 
-	protected function createSession($id, array $session, Response $response)
+	public function createSession($id, array $session, Response $response)
 	{
 		//
 	}
 
-	protected function updateSession($id, array $session, Response $response)
+	public function updateSession($id, array $session, Response $response)
 	{
 		//
 	}

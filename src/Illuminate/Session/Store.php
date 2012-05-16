@@ -56,7 +56,7 @@ abstract class Store implements ArrayAccess {
 	 * @param  Symfony\Component\HttpFoundation\Request  $request
 	 * @return array|null
 	 */
-	abstract protected function retrieveSession($id, Request $request);
+	abstract public function retrieveSession($id, Request $request);
 
 	/**
 	 * Create a new session in storage.
@@ -66,7 +66,7 @@ abstract class Store implements ArrayAccess {
 	 * @param  Symfony\Component\HttpFoundation\Response  $response
 	 * @return void
 	 */
-	abstract protected function createSession($id, array $session, Response $response);
+	abstract public function createSession($id, array $session, Response $response);
 
 	/**
 	 * Update an existing session in storage.
@@ -76,7 +76,7 @@ abstract class Store implements ArrayAccess {
 	 * @param  Symfony\Component\HttpFoundation\Response  $response
 	 * @return void
 	 */
-	abstract protected function updateSession($id, array $session, Response $response);
+	abstract public function updateSession($id, array $session, Response $response);
 
 	/**
 	 * Load the session for the request.

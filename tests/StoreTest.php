@@ -191,16 +191,78 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testSweepersAreCalled()
+	{
+		$stub = $this->storeMock(array('getCurrentTime', 'sweep'), 'SweeperStub');
+		$stub->setSession($this->dummySession());
+		$stub->expects($this->any())->method('getCurrentTime')->will($this->returnValue(1));
+		$stub->expects($this->once())->method('sweep')->with($this->equalTo(1 - (120 * 60)));
+		$stub->setSweepLottery(100, 100);
+		$stub->finish(new Symfony\Component\HttpFoundation\Response);
+	}
+
+
 	protected function dummySession()
 	{
 		return array('id' => '123', 'data' => array(':old:' => array(), ':new:' => array()), 'last_activity' => '9999999999');
 	}
 
 
-	protected function storeMock($stub = array())
+	protected function storeMock($stub = array(), $class = 'Illuminate\Session\Store')
 	{
 		$stub = array_merge((array) $stub, array('retrieveSession', 'createSession', 'updateSession'));
-		return $this->getMock('Illuminate\Session\Store', $stub);
+		return $this->getMock($class, $stub);
+	}
+
+}
+
+
+class SweeperStub extends Illuminate\Session\Store implements Illuminate\Session\Sweeper {
+
+	/**
+	 * Retrieve a session payload from storage.
+	 *
+	 * @param  string      $id
+	 * @return array|null
+	 */
+	protected function retrieveSession($id)
+	{
+		//
+	}
+
+	/**
+	 * Create a new session in storage.
+	 *
+	 * @param  string  $id
+	 * @param  array   $session
+	 * @return void
+	 */
+	protected function createSession($id, array $session)
+	{
+		//
+	}
+
+	/**
+	 * Update an existing session in storage.
+	 *
+	 * @param  string  $id
+	 * @param  array   $session
+	 * @return void
+	 */
+	protected function updateSession($id, array $session)
+	{
+		//
+	}
+
+	/**
+	 * Remove session records older than a given expiration.
+	 *
+	 * @param  int   $expiration
+	 * @return void
+	 */
+	public function sweep($expiration)
+	{
+		//
 	}
 
 }

@@ -300,10 +300,12 @@ abstract class Store implements ArrayAccess {
 	 */
 	public function finish(Response $response)
 	{
+		$time = $this->getCurrentTime();
+
 		// First we will set the last activity timestamp on the session and age
 		// the session flash data so the old flash data is gone on following
 		// requests. Then we'll call the driver methods to store the data.
-		$this->session['last_activity'] = $this->getCurrentTime();
+		$this->session['last_activity'] = $time;
 
 		$id = $this->getSessionID();
 
@@ -326,7 +328,7 @@ abstract class Store implements ArrayAccess {
 		// the storage spot does not get junked up with expired sessions.
 		if ($this instanceof Sweeper and $this->lottery())
 		{
-			$this->sweep(time() - ($this->lifetime * 60));
+			$this->sweep($time - ($this->lifetime * 60));
 		}
 
 		$response->headers->setCookie($this->createCookie());
@@ -359,7 +361,7 @@ abstract class Store implements ArrayAccess {
 	 *
 	 * @return bool
 	 */
-	protected function lottery()
+	public function lottery()
 	{
 		return mt_rand(1, $this->sweep[1]) <= $this->sweep[0];
 	}

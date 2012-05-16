@@ -279,6 +279,18 @@ abstract class Store implements ArrayAccess {
 	}
 
 	/**
+	 * Generate a new session identifier.
+	 *
+	 * @return string
+	 */
+	public function regenerateSession()
+	{
+		$this->exists = false;
+
+		return $this->session['id'] = $this->createSessionID();
+	}
+
+	/**
 	 * Finish the session handling for the request.
 	 *
 	 * @param  Symfony\Component\HttpFoundation\Response  $response
@@ -372,6 +384,16 @@ abstract class Store implements ArrayAccess {
 	}
 
 	/**
+	 * Get the session payload.
+	 *
+	 * @var array
+	 */
+	public function getSession()
+	{
+		return $this->session;
+	}
+
+	/**
 	 * Get the current session ID.
 	 *
 	 * @return string
@@ -389,18 +411,6 @@ abstract class Store implements ArrayAccess {
 	public function getLastActivity()
 	{
 		if (isset($this->session['last_activity'])) return $this->session['last_activity'];
-	}
-
-	/**
-	 * Generate a new session identifier.
-	 *
-	 * @return string
-	 */
-	public function regenerateSession()
-	{
-		$this->exists = false;
-
-		return $this->session['id'] = $this->createSessionID();
 	}
 
 	/**

@@ -12,8 +12,10 @@
         "illuminate/cache": ">=1.0.0",
         "illuminate/encryption": ">=1.0.0",
         "illuminate/filesystem": ">=1.0.0",
-        "mockery/mockery": "dev-master",
         "symfony/http-foundation": ">=2.0.0"
+    },
+    "require-dev": {
+        "mockery/mockery": ">=0.7.2"
     },
     "autoload": {
         "psr-0": {"Illuminate\\Session": "src/"}

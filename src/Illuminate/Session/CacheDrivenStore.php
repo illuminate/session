@@ -45,7 +45,7 @@ class CacheDrivenStore extends Store {
 	 */
 	public function createSession($id, array $session, Response $response)
 	{
-		$this->cache->forever($id, serialize($session));
+		$this->cache->forever($id, $session);
 	}
 
 	/**
@@ -58,7 +58,7 @@ class CacheDrivenStore extends Store {
 	 */
 	public function updateSession($id, array $session, Response $response)
 	{
-		return $this->createSession($id, $session);
+		return $this->createSession($id, $session, $response);
 	}
 
 }

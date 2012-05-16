@@ -142,6 +142,55 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testFinishMethodCallsUpdateMethodAndAgesFlashData()
+	{
+		$store = $this->storeMock('getCurrentTime');
+		$store->setSession($session = array('id' => '1', 'data' => array(':old:' => array('foo' => 'bar'), ':new:' => array('baz' => 'boom'))));
+		$store->expects($this->any())->method('getCurrentTime')->will($this->returnValue(1));
+		$session['last_activity'] = 1;
+		$session['data'] = array(':old:' => array('baz' => 'boom'), ':new:' => array());
+		$store->expects($this->once())->method('updateSession')->with($this->equalTo('1'), $this->equalTo($session));
+		$response = new Symfony\Component\HttpFoundation\Response;
+		$store->finish($response);
+	}
+
+
+	public function testFinishMethodCallsCreateMethodAndAgesFlashData()
+	{
+		$store = $this->storeMock('getCurrentTime');
+		$store->setSession($session = array('id' => '1', 'data' => array(':old:' => array('foo' => 'bar'), ':new:' => array('baz' => 'boom'))));
+		$store->expects($this->any())->method('getCurrentTime')->will($this->returnValue(1));
+		$session['last_activity'] = 1;
+		$session['data'] = array(':old:' => array('baz' => 'boom'), ':new:' => array());
+		$store->expects($this->once())->method('createSession')->with($this->equalTo('1'), $this->equalTo($session));
+		$store->setExists(false);
+		$response = new Symfony\Component\HttpFoundation\Response;
+		$store->finish($response);	
+	}
+
+
+	public function testFinishMethodSetsCookieUsingOptions()
+	{
+		$store = $this->storeMock('getCurrentTime');
+		$store->setSession($session = array('id' => '1', 'data' => array(':old:' => array('foo' => 'bar'), ':new:' => array('baz' => 'boom'))));
+		$response = new Symfony\Component\HttpFoundation\Response;
+		$store->expects($this->any())->method('getCurrentTime')->will($this->returnValue(1));
+		$store->setCookieOption('path', '//');
+		$store->setCookieOption('domain', 'foo.com');
+		$store->finish($response);
+
+		$cookies = $response->headers->getCookies();
+		$this->assertTrue(count($cookies) === 1);
+		$cookie = $cookies[0];
+		$this->assertEquals('1', $cookie->getValue());
+		$this->assertEquals('foo.com', $cookie->getDomain());
+		$this->assertEquals('//', $cookie->getPath());
+		$this->assertEquals('illuminate_session', $cookie->getName());
+		$expiration = 1 + (120 * 60);
+		$this->assertEquals($expiration, $cookie->getExpiresTime());
+	}
+
+
 	protected function dummySession()
 	{
 		return array('id' => '123', 'data' => array(':old:' => array(), ':new:' => array()), 'last_activity' => '9999999999');

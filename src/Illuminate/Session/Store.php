@@ -240,7 +240,9 @@ abstract class Store implements ArrayAccess {
 	{
 		$old = $this->session['data'][':old:'];
 
-		$this->session['data'][':new:'] = array_merge($this->session['data'][':new:'], $old);
+		$new = $this->session['data'][':new:'];
+
+		$this->session['data'][':new:'] = array_merge($new, $old);
 	}
 
 	/**
@@ -301,7 +303,7 @@ abstract class Store implements ArrayAccess {
 		// First we will set the last activity timestamp on the session and age
 		// the session flash data so the old flash data is gone on following
 		// requests. Then we'll call the driver methods to store the data.
-		$this->session['last_activity'] = time();
+		$this->session['last_activity'] = $this->getCurrentTime();
 
 		$id = $this->getSessionID();
 
@@ -343,6 +345,16 @@ abstract class Store implements ArrayAccess {
 	}
 
 	/**
+	 * Get the current timestamp.
+	 *
+	 * @return int
+	 */
+	protected function getCurrentTime()
+	{
+		return time();
+	}
+
+	/**
 	 * Determine if the request hits the sweeper lottery.
 	 *
 	 * @return bool
@@ -359,7 +371,7 @@ abstract class Store implements ArrayAccess {
 	 */
 	protected function createCookie()
 	{
-		$expiration = time() + ($this->lifetime * 60);
+		$expiration = $this->getCurrentTime() + ($this->lifetime * 60);
 
 		// The value of the cookie will be set to the current session ID as
 		// that will allow us identify the session on subsequent requests
@@ -380,7 +392,7 @@ abstract class Store implements ArrayAccess {
 	{
 		extract($this->cookie);
 
-		return new Cookie($name, $value, $expire, $path, $domain, $secure, $http_only);
+		return new Cookie($name, $value, $expiration, $path, $domain, $secure, $http_only);
 	}
 
 	/**
@@ -421,7 +433,10 @@ abstract class Store implements ArrayAccess {
 	 */
 	public function getLastActivity()
 	{
-		if (isset($this->session['last_activity'])) return $this->session['last_activity'];
+		if (isset($this->session['last_activity']))
+		{
+			return $this->session['last_activity'];
+		}
 	}
 
 	/**
@@ -432,6 +447,17 @@ abstract class Store implements ArrayAccess {
 	public function sessionExists()
 	{
 		return $this->exists;
+	}
+
+	/**
+	 * Set the existence of the session.
+	 *
+	 * @param  bool  $value
+	 * @return void
+	 */
+	public function setExists($value)
+	{
+		$this->exists = $value;
 	}
 
 	/**

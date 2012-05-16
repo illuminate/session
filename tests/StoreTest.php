@@ -131,6 +131,17 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testRegenerateMethod()
+	{
+		$store = $this->storeMock();
+		$store->setSession(array('id' => '1'));
+		$store->regenerateSession();
+		$session = $store->getSession();
+		$this->assertTrue(strlen($session['id']) == 40);
+		$this->assertFalse($store->sessionExists());
+	}
+
+
 	protected function dummySession()
 	{
 		return array('id' => '123', 'data' => array(':old:' => array(), ':new:' => array()), 'last_activity' => '9999999999');

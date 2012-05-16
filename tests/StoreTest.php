@@ -80,6 +80,26 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testFlashMethodPutsDataInNewArray()
+	{
+		$store = $this->storeMock();
+		$store->setSession(array('id' => '1', 'data' => array(':new:' => array(), ':old:' => array())));
+		$store->flash('foo', 'bar');
+		$session = $store->getSession();
+		$this->assertEquals('bar', $session['data'][':new:']['foo']);
+	}
+
+
+	public function testReflashMethod()
+	{
+		$store = $this->storeMock();
+		$store->setSession(array('id' => '1', 'data' => array(':new:' => array(), ':old:' => array('foo' => 'bar'))));
+		$store->reflash();
+		$session = $store->getSession();
+		$this->assertEquals(array('foo' => 'bar'), $session['data'][':new:']);
+	}
+
+
 	public function testArrayAccess()
 	{
 		$store = $this->storeMock();

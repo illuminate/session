@@ -99,7 +99,7 @@ abstract class Store implements ArrayAccess {
 		// If the session is not valid, we will create a new payload and will
 		// indicate that the session has not yet been created. The freshly
 		// created session payload will be assigned a fresh session ID.
-		if ($this->isInvalid($session))
+		if ( ! isset($session) or $this->isInvalid($session))
 		{
 			$this->exists = false;
 

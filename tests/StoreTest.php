@@ -202,6 +202,17 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testSweeperIsNotCalledAgainstOdds()
+	{
+		$stub = $this->storeMock(array('getCurrentTime', 'sweep'), 'SweeperStub');
+		$stub->setSession($this->dummySession());
+		$stub->expects($this->any())->method('getCurrentTime')->will($this->returnValue(1));
+		$stub->expects($this->never())->method('sweep');
+		$stub->setSweepLottery(0, 100);
+		$stub->finish(new Symfony\Component\HttpFoundation\Response);	
+	}
+
+
 	protected function dummySession()
 	{
 		return array('id' => '123', 'data' => array(':old:' => array(), ':new:' => array()), 'last_activity' => '9999999999');

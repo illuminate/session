@@ -80,6 +80,18 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testArrayAccess()
+	{
+		$store = $this->storeMock();
+		$store->setSession(array('id' => '1', 'data' => array()));
+
+		$store['foo'] = 'bar';
+		$this->assertEquals('bar', $store['foo']);
+		unset($store['foo']);
+		$this->assertFalse(isset($store['foo']));
+	}
+
+
 	protected function dummySession()
 	{
 		return array('id' => '123', 'data' => array(':old:' => array(), ':new:' => array()), 'last_activity' => '9999999999');

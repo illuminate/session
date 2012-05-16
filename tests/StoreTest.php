@@ -110,6 +110,15 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testFlushMethod()
+	{
+		$store = $this->storeMock(array('createData'));
+		$store->setSession(array('id' => '1', 'data' => array(':new:' => array('foo' => 'bar'))));
+		$store->expects($this->once())->method('createData');
+		$store->flush();
+	}
+
+
 	public function testArrayAccess()
 	{
 		$store = $this->storeMock();

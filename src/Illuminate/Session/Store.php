@@ -52,7 +52,7 @@ abstract class Store implements ArrayAccess {
 	/**
 	 * Retrieve a session payload from storage.
 	 *
-	 * @param  string                                    $id
+	 * @param  string  $id
 	 * @param  Symfony\Component\HttpFoundation\Request  $request
 	 * @return array|null
 	 */
@@ -61,8 +61,8 @@ abstract class Store implements ArrayAccess {
 	/**
 	 * Create a new session in storage.
 	 *
-	 * @param  string                                     $id
-	 * @param  array                                      $session
+	 * @param  string  $id
+	 * @param  array   $session
 	 * @param  Symfony\Component\HttpFoundation\Response  $response
 	 * @return void
 	 */
@@ -71,8 +71,8 @@ abstract class Store implements ArrayAccess {
 	/**
 	 * Update an existing session in storage.
 	 *
-	 * @param  string                                     $id
-	 * @param  array                                      $session
+	 * @param  string  $id
+	 * @param  array   $session
 	 * @param  Symfony\Component\HttpFoundation\Response  $response
 	 * @return void
 	 */
@@ -334,7 +334,9 @@ abstract class Store implements ArrayAccess {
 			$this->sweep($time - ($this->lifetime * 60));
 		}
 
-		$response->headers->setCookie($this->createCookie($id));
+		$name = $this->getCookieName();
+
+		$response->headers->setCookie($this->createCookie($name, $id));
 	}
 
 	/**
@@ -372,26 +374,28 @@ abstract class Store implements ArrayAccess {
 	/**
 	 * Create a cookie instance for the session.
 	 *
+	 * @param  string  $name
 	 * @param  string  $value
 	 * @return Symfony\Component\HttpFoundation\Cookie
 	 */
-	protected function createCookie($value)
+	protected function createCookie($name, $value)
 	{
 		$expiration = $this->getCurrentTime() + ($this->lifetime * 60);
 
-		return $this->buildCookie($value, $expiration);
+		return $this->buildCookie($name, $value, $expiration);
 	}
 
 	/**
 	 * Create a new Symfony cookie instance.
 	 *
+	 * @param  string   $name
 	 * @param  string   $value
-	 * @param  int      $expiratoin
+	 * @param  int      $expiration
 	 * @return Symfony\Component\HttpFoundation\Cookie
 	 */
-	protected function buildCookie($value, $expiration)
+	protected function buildCookie($name, $value, $expiration)
 	{
-		extract($this->cookie);
+		extract($this->cookie, EXTR_SKIP);
 
 		return new Cookie($name, $value, $expiration, $path, $domain, $secure, $http_only);
 	}

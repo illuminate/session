@@ -26,7 +26,7 @@ class CacheDrivenStore extends Store {
 	/**
 	 * Retrieve a session payload from storage.
 	 *
-	 * @param  string                                    $id
+	 * @param  string  $id
 	 * @param  Symfony\Component\HttpFoundation\Request  $request
 	 * @return array|null
 	 */
@@ -38,8 +38,8 @@ class CacheDrivenStore extends Store {
 	/**
 	 * Create a new session in storage.
 	 *
-	 * @param  string                                     $id
-	 * @param  array                                      $session
+	 * @param  string  $id
+	 * @param  array   $session
 	 * @param  Symfony\Component\HttpFoundation\Response  $response
 	 * @return void
 	 */
@@ -51,8 +51,8 @@ class CacheDrivenStore extends Store {
 	/**
 	 * Update an existing session in storage.
 	 *
-	 * @param  string                                     $id
-	 * @param  array                                      $session
+	 * @param  string  $id
+	 * @param  array   $session
 	 * @param  Symfony\Component\HttpFoundation\Response  $response
 	 * @return void
 	 */

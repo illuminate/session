@@ -33,7 +33,7 @@ class CookieStore extends Store {
 	/**
 	 * Retrieve a session payload from storage.
 	 *
-	 * @param  string                                    $id
+	 * @param  string  $id
 	 * @param  Symfony\Component\HttpFoundation\Request  $request
 	 * @return array|null
 	 */
@@ -50,8 +50,8 @@ class CookieStore extends Store {
 	/**
 	 * Create a new session in storage.
 	 *
-	 * @param  string                                     $id
-	 * @param  array                                      $session
+	 * @param  string  $id
+	 * @param  array   $session
 	 * @param  Symfony\Component\HttpFoundation\Response  $response
 	 * @return void
 	 */
@@ -59,14 +59,14 @@ class CookieStore extends Store {
 	{
 		$value = $this->encrypter->encrypt(serialize($session));
 
-		$response->headers->setCookie($this->createCookie($value));
+		$response->headers->setCookie($this->createCookie($this->payload, $value));
 	}
 
 	/**
 	 * Update an existing session in storage.
 	 *
-	 * @param  string                                     $id
-	 * @param  array                                      $session
+	 * @param  string  $id
+	 * @param  array   $session
 	 * @param  Symfony\Component\HttpFoundation\Response  $response
 	 * @return void
 	 */

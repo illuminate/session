@@ -1,6 +1,7 @@
 <?php namespace Illuminate\Session;
 
 use Illuminate\Encrypter;
+use Illuminate\CookieCreator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -14,6 +15,13 @@ class CookieStore extends Store {
 	protected $encrypter;
 
 	/**
+	 * The Illuminate cookie creator.
+	 *
+	 * @var Illuminate\Cookie
+	 */
+	protected $cookies;
+
+	/**
 	 * The name of the session payload cookie.
 	 *
 	 * @var string
@@ -23,11 +31,13 @@ class CookieStore extends Store {
 	/**
 	 * Create a new Cookie based session store.
 	 *
-	 * @param  Illuminate\Encrypter  $encrypter
+	 * @param  Illuminate\Encrypter      $encrypter
+	 * @param  Illuminate\CookieCreator  $cookie
 	 * @return void
 	 */
-	public function __construct(Encrypter $encrypter)
+	public function __construct(Encrypter $encrypter, CookieCreator $cookie)
 	{
+		$this->cookies = $cookie;
 		$this->encrypter = $encrypter;
 	}
 
@@ -60,7 +70,7 @@ class CookieStore extends Store {
 	{
 		$value = $this->encrypter->encrypt(serialize($session));
 
-		$response->headers->setCookie($this->createCookie($this->payload, $value));
+		$response->headers->setCookie($this->cookies->make($this->payload, $value));
 	}
 
 	/**

@@ -151,7 +151,8 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 		$session['data'] = array(':old:' => array('baz' => 'boom'), ':new:' => array());
 		$store->expects($this->once())->method('updateSession')->with($this->equalTo('1'), $this->equalTo($session));
 		$response = new Response;
-		$store->finish($response);
+		$cookie = new Illuminate\CookieCreator;
+		$store->finish($response, $cookie);
 	}
 
 
@@ -165,19 +166,18 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 		$store->expects($this->once())->method('createSession')->with($this->equalTo('1'), $this->equalTo($session));
 		$store->setExists(false);
 		$response = new Response;
-		$store->finish($response);	
+		$cookie = new Illuminate\CookieCreator;
+		$store->finish($response, $cookie);	
 	}
 
 
-	public function testFinishMethodSetsCookieUsingOptions()
+	public function testFinishMethodSetsCookie()
 	{
 		$store = $this->storeMock('getCurrentTime');
 		$store->setSession($session = array('id' => '1', 'data' => array(':old:' => array('foo' => 'bar'), ':new:' => array('baz' => 'boom'))));
 		$response = new Response;
-		$store->expects($this->any())->method('getCurrentTime')->will($this->returnValue(1));
-		$store->setCookieOption('path', '//');
-		$store->setCookieOption('domain', 'foo.com');
-		$store->finish($response);
+		$cookie = new Illuminate\CookieCreator('//', 'foo.com');
+		$store->finish($response, $cookie);
 
 		$cookies = $response->headers->getCookies();
 		$this->assertTrue(count($cookies) === 1);
@@ -186,8 +186,6 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('foo.com', $cookie->getDomain());
 		$this->assertEquals('//', $cookie->getPath());
 		$this->assertEquals('illuminate_session', $cookie->getName());
-		$expiration = 1 + (120 * 60);
-		$this->assertEquals($expiration, $cookie->getExpiresTime());
 	}
 
 
@@ -198,7 +196,7 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 		$stub->expects($this->any())->method('getCurrentTime')->will($this->returnValue(1));
 		$stub->expects($this->once())->method('sweep')->with($this->equalTo(1 - (120 * 60)));
 		$stub->setSweepLottery(100, 100);
-		$stub->finish(new Symfony\Component\HttpFoundation\Response);
+		$stub->finish(new Symfony\Component\HttpFoundation\Response, new Illuminate\CookieCreator);
 	}
 
 
@@ -209,7 +207,7 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 		$stub->expects($this->any())->method('getCurrentTime')->will($this->returnValue(1));
 		$stub->expects($this->never())->method('sweep');
 		$stub->setSweepLottery(0, 100);
-		$stub->finish(new Symfony\Component\HttpFoundation\Response);	
+		$stub->finish(new Symfony\Component\HttpFoundation\Response, new Illuminate\CookieCreator);	
 	}
 
 

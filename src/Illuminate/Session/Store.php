@@ -2,7 +2,7 @@
 
 use Closure;
 use ArrayAccess;
-use Symfony\Component\HttpFoundation\Cookie;
+use Illuminate\CookieCreator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -299,9 +299,10 @@ abstract class Store implements ArrayAccess {
 	 * Finish the session handling for the request.
 	 *
 	 * @param  Symfony\Component\HttpFoundation\Response  $response
+	 * @param  Illuminate\CookieCreator                   $cookie
 	 * @return void
 	 */
-	public function finish(Response $response)
+	public function finish(Response $response, CookieCreator $cookie)
 	{
 		$time = $this->getCurrentTime();
 
@@ -336,7 +337,7 @@ abstract class Store implements ArrayAccess {
 
 		$name = $this->getCookieName();
 
-		$response->headers->setCookie($this->createCookie($name, $id));
+		$response->headers->setCookie($cookie->make($name, $id));
 	}
 
 	/**
@@ -369,35 +370,6 @@ abstract class Store implements ArrayAccess {
 	public function lottery()
 	{
 		return mt_rand(1, $this->sweep[1]) <= $this->sweep[0];
-	}
-
-	/**
-	 * Create a cookie instance for the session.
-	 *
-	 * @param  string  $name
-	 * @param  string  $value
-	 * @return Symfony\Component\HttpFoundation\Cookie
-	 */
-	protected function createCookie($name, $value)
-	{
-		$expiration = $this->getCurrentTime() + ($this->lifetime * 60);
-
-		return $this->buildCookie($name, $value, $expiration);
-	}
-
-	/**
-	 * Create a new Symfony cookie instance.
-	 *
-	 * @param  string   $name
-	 * @param  string   $value
-	 * @param  int      $expiration
-	 * @return Symfony\Component\HttpFoundation\Cookie
-	 */
-	protected function buildCookie($name, $value, $expiration)
-	{
-		extract($this->cookie, EXTR_SKIP);
-
-		return new Cookie($name, $value, $expiration, $path, $domain, $secure, $http_only);
 	}
 
 	/**

@@ -30,6 +30,7 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse($store->sessionExists());
 		$this->assertTrue(strlen($session['id']) == 40);
 		$this->assertTrue(strlen($session['data']['csrf_token']) == 40);
+		$this->assertEquals($session['data']['csrf_token'], $store->getToken());
 		$this->assertFalse(isset($session['last_activity']));
 	}
 

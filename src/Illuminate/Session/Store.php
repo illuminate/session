@@ -131,7 +131,9 @@ abstract class Store implements ArrayAccess {
 	 */
 	protected function createData()
 	{
-		return array(':old:' => array(), ':new:' => array());
+		$token = $this->createSessionID();
+
+		return array('csrf_token' => $token, ':old:' => array(), ':new:' => array());
 	}
 
 	/**

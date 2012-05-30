@@ -6,7 +6,7 @@ use Illuminate\CookieCreator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-abstract class Store implements ArrayAccess {
+abstract class Store implements TokenProvider, ArrayAccess {
 
 	/**
 	 * The current session payload.
@@ -210,6 +210,16 @@ abstract class Store implements ArrayAccess {
 		}
 
 		return $default instanceof Closure ? $default() : $default;
+	}
+
+	/**
+	 * Get the CSRF token value.
+	 *
+	 * @return string
+	 */
+	public function getToken()
+	{
+		return $this->get('csrf_token');
 	}
 
 	/**

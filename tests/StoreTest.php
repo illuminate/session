@@ -221,6 +221,9 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 		$session = $store->getSession();
 		$this->assertEquals(array('foo' => 'bar'), $session['data'][':new:']['__old_input']);
 		$this->assertEquals('bar', $store->getOldInput('foo'));
+		$this->assertEquals(array('foo' => 'bar'), $store->getOldInput());
+		$this->assertEquals('bar', $store->getOldInput('adslkasd', 'bar'));
+		$this->assertEquals('bar', $store->getOldInput('adlkasdf', function() { return 'bar'; }));
 	}
 
 

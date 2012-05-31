@@ -213,6 +213,17 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testFlashInputFlashesInput()
+	{
+		$store = $this->storeMock();
+		$store->setSession($this->dummySession());
+		$store->flashInput(array('foo' => 'bar'));
+		$session = $store->getSession();
+		$this->assertEquals(array('foo' => 'bar'), $session['data'][':new:']['__old_input']);
+		$this->assertEquals('bar', $store->getOldInput('foo'));
+	}
+
+
 	protected function dummySession()
 	{
 		return array('id' => '123', 'data' => array(':old:' => array(), ':new:' => array()), 'last_activity' => '9999999999');

@@ -213,6 +213,30 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	}
 
 	/**
+	 * Get the requested item from the flashed input array.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $default
+	 * @return mixed
+	 */
+	public function getOldInput($key, $default = null)
+	{
+		$input = $this->get('__old_input');
+
+		// Input that is flashed to the session can be easily retrieved by the
+		// developer, making repopulating old forms and the like much more
+		// convenient, since the request's previous input is available.
+		if (array_key_exists($key, $input))
+		{
+			return $input[$key];
+		}
+		else
+		{
+			return $default instanceof Closure ? $default() : $default;
+		}
+	}
+
+	/**
 	 * Get the CSRF token value.
 	 *
 	 * @return string
@@ -244,6 +268,17 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	public function flash($key, $value)
 	{
 		$this->session['data'][':new:'][$key] = $value;
+	}
+
+	/**
+	 * Flash an input array to the session.
+	 *
+	 * @param  array  $value
+	 * @return void
+	 */
+	public function flashInput(array $value)
+	{
+		return $this->flash('__old_input', $value);
 	}
 
 	/**

@@ -98,7 +98,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 
 		// If the session is not valid, we will create a new payload and will
 		// indicate that the session has not yet been created. The freshly
-		// created session payload will be assigned a fresh session ID.
+		// created session payloads will be assigned a fresh session ID.
 		if ( ! isset($session) or $this->isInvalid($session))
 		{
 			$this->exists = false;
@@ -106,9 +106,9 @@ abstract class Store implements TokenProvider, ArrayAccess {
 			$session = $this->createFreshSession();
 		}
 
-		// Once the session payload has been created or loaded we will set it
+		// Once the session payload has been created / loaded we will set it
 		// to an internal value that is managed by the driver. The values
-		// are not persisted back into storage until session closing.
+		// are not persisted back into storage until the session closes.
 		$this->session = $session;
 	}
 
@@ -195,7 +195,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 
 		// Session flash data is only persisted for the next request into the app
 		// which makes it convenient for temporary status messages or various
-		// other strings. We'll check all of the flash data for the item.
+		// other strings. We'll check all of the flash data for the items.
 		elseif (isset($data[':new:'][$key]))
 		{
 			return $data[':new:'][$key];
@@ -203,7 +203,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 
 		// The "old" flash data are the data flashed during the previous request
 		// while the "new" data is the data flashed during the course of this
-		// current request. Typically developers will be asking for "old".
+		// current request. Typically developers are asking for the "olds".
 		elseif (isset($data[':old:'][$key]))
 		{
 			return $data[':old:'][$key];
@@ -350,7 +350,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	 * Finish the session handling for the request.
 	 *
 	 * @param  Symfony\Component\HttpFoundation\Response  $response
-	 * @param  Illuminate\CookieCreator                   $cookie
+	 * @param  Illuminate\CookieCreator  $cookie
 	 * @return void
 	 */
 	public function finish(Response $response, CookieCreator $cookie)
@@ -379,8 +379,8 @@ abstract class Store implements TokenProvider, ArrayAccess {
 		}
 
 		// If the driver implements the Sweeper interface and hits the sweeper
-		// lottery, we will sweep sessoins from storage that are expired so
-		// the storage spot does not get junked up with expired sessions.
+		// lottery we will sweep sessoins from storage that are expired so
+		// the storage spot doesn't get junked up with expired sessions.
 		if ($this instanceof Sweeper and $this->lottery())
 		{
 			$this->sweep($time - ($this->lifetime * 60));

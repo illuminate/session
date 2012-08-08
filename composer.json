@@ -20,5 +20,6 @@
     },
     "autoload": {
         "psr-0": {"Illuminate\\Session": "src/"}
-    }
+    },
+    "minimum-stability": "dev"
 }

@@ -17,7 +17,7 @@ class CookieStore extends Store {
 	/**
 	 * The Illuminate cookie creator.
 	 *
-	 * @var Illuminate\Cookie
+	 * @var Illuminate\CookieCreator
 	 */
 	protected $cookies;
 
@@ -31,7 +31,7 @@ class CookieStore extends Store {
 	/**
 	 * Create a new Cookie based session store.
 	 *
-	 * @param  Illuminate\Encrypter      $encrypter
+	 * @param  Illuminate\Encrypter  $encrypter
 	 * @param  Illuminate\CookieCreator  $cookie
 	 * @return void
 	 */

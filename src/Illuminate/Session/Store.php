@@ -88,17 +88,17 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	{
 		$id = $request->cookies->get($this->getCookieName());
 
-		// If the session ID was available via the request cookies, we'll just
-		// retrieve the session payload from the driver and check the given
-		// session on validity. All data fetching is driver implemented.
+		// If the session ID was available via the request cookies we'll just retrieve
+		// the session payload from the driver and check the given session to make
+		// sure it's valid. All the data fetching is implemented by the driver.
 		if ( ! is_null($id))
 		{
 			$session = $this->retrieveSession($id, $request);
 		}
 
-		// If the session is not valid, we will create a new payload and will
-		// indicate that the session has not yet been created. The freshly
-		// created session payloads will be assigned a fresh session ID.
+		// If the session is not valid, we will create a new payload and will indicate
+		// that the session has not yet been created. These freshly created session
+		// payloads will be given a fresh session ID so there are not collisions.
 		if ( ! isset($session) or $this->isInvalid($session))
 		{
 			$this->exists = false;
@@ -106,9 +106,9 @@ abstract class Store implements TokenProvider, ArrayAccess {
 			$session = $this->createFreshSession();
 		}
 
-		// Once the session payload has been created / loaded we will set it
-		// to an internal value that is managed by the driver. The values
-		// are not persisted back into storage until the session closes.
+		// Once the session payload has been created or loaded we will set it to an
+		// internal value that is managed by the driver. The values aren't sent
+		// back into storage until the session is closed after this requests.
 		$this->session = $session;
 	}
 
@@ -195,7 +195,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 
 		// Session flash data is only persisted for the next request into the app
 		// which makes it convenient for temporary status messages or various
-		// other strings. We'll check all of the flash data for the items.
+		// other strings. We'll check all of this flash data for the items.
 		elseif (isset($data[':new:'][$key]))
 		{
 			return $data[':new:'][$key];
@@ -357,18 +357,18 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	{
 		$time = $this->getCurrentTime();
 
-		// First we will set the last activity timestamp on the session and age
-		// the session flash data so the old flash data is gone on following
-		// requests. Then we'll call the driver methods to store the data.
+		// First we will set the last activity timestamp on the session and age the
+		// session flash data so the old data is gone when subsequent calls into
+		// the application are made. Then we'll call the driver store methods.
 		$this->session['last_activity'] = $time;
 
 		$id = $this->getSessionID();
 
 		$this->ageFlashData();
 
-		// We'll distinguish between updating and creating sessions in case it
-		// matters to the driver. Most drivers will probably be able to use
-		// the same code regardless of whether the session is new or not.
+		// We'll distinguish between updating and creating sessions since it might
+		// matter to the driver. Most drivers will probably be able to use the
+		// same code regardless of whether the session is new or not though.
 		if ($this->exists)
 		{
 			$this->updateSession($id, $this->session, $response);
@@ -378,10 +378,10 @@ abstract class Store implements TokenProvider, ArrayAccess {
 			$this->createSession($id, $this->session, $response);
 		}
 
-		// If the driver implements the Sweeper interface and hits the sweeper
-		// lottery we will sweep sessoins from storage that are expired so
-		// the storage spot doesn't get junked up with expired sessions.
-		if ($this instanceof Sweeper and $this->lottery())
+		// If this driver implements the "Sweeper" interface and hits the sweepers
+		// lottery we will sweep sessoins from storage that are expired so the
+		// storage spot does not get junked up with expired session storage.
+		if ($this instanceof Sweeper and $this->hitsLottery())
 		{
 			$this->sweep($time - ($this->lifetime * 60));
 		}
@@ -418,7 +418,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	 *
 	 * @return bool
 	 */
-	public function lottery()
+	public function hitsLottery()
 	{
 		return mt_rand(1, $this->sweep[1]) <= $this->sweep[0];
 	}

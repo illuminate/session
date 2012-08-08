@@ -8,7 +8,7 @@ class CookieStoreTest extends PHPUnit_Framework_TestCase {
 
 	public function testRetrieveSessionProperlyDecryptsCookie()
 	{
-		$encrypter = new Encrypter(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC, 'key');
+		$encrypter = new Encrypter('key', MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC);
 		$store = new CookieStore($encrypter, new Illuminate\CookieCreator);
 		$session = $encrypter->encrypt(serialize($expect = array('id' => '1', 'data' => array('foo' => 'bar'), 'last_activity' => '9999999999')));
 		$request = Request::create('/', 'GET', array(), array('illuminate_session' => 1, 'illuminate_payload' => $session));
@@ -19,7 +19,7 @@ class CookieStoreTest extends PHPUnit_Framework_TestCase {
 
 	public function testCreateSessionStoresCookiePayload()
 	{
-		$encrypter = new Encrypter(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC, 'key');
+		$encrypter = new Encrypter('key', MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC);
 		$cookie = new Illuminate\CookieCreator;
 		$store = new Illuminate\Session\CookieStore($encrypter, $cookie);
 		$session = array('id' => '1', 'data' => array(':old:' => array(), ':new:' => array()));

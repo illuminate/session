@@ -213,6 +213,16 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	}
 
 	/**
+	 * Get a full array of session data, including flash data.
+	 * 
+	 * @return array
+	 */
+	public function all()
+	{
+		return $this->session['data'];
+	}
+
+	/**
 	 * Get the requested item from the flashed input array.
 	 *
 	 * @param  string  $key

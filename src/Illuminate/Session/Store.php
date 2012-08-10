@@ -164,6 +164,16 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	}
 
 	/**
+	 * Get the full array of session data, including flash data.
+	 * 
+	 * @return array
+	 */
+	public function all()
+	{
+		return $this->session['data'];
+	}
+
+	/**
 	 * Determine if the session contains a given item.
 	 *
 	 * @param  string  $key
@@ -203,23 +213,13 @@ abstract class Store implements TokenProvider, ArrayAccess {
 
 		// The "old" flash data are the data flashed during the previous request
 		// while the "new" data is the data flashed during the course of this
-		// current request. Typically developers are asking for the "olds".
+		// current request. Usually developers will be retrieving the olds.
 		elseif (isset($data[':old:'][$key]))
 		{
 			return $data[':old:'][$key];
 		}
 
 		return $default instanceof Closure ? $default() : $default;
-	}
-
-	/**
-	 * Get a full array of session data, including flash data.
-	 * 
-	 * @return array
-	 */
-	public function all()
-	{
-		return $this->session['data'];
 	}
 
 	/**

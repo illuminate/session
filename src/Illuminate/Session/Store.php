@@ -396,9 +396,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 			$this->sweep($time - ($this->lifetime * 60));
 		}
 
-		$name = $this->getCookieName();
-
-		$response->headers->setCookie($cookie->make($name, $id));
+		$this->writeCookie($id, $response, $cookie);
 	}
 
 	/**
@@ -431,6 +429,21 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	public function hitsLottery()
 	{
 		return mt_rand(1, $this->sweep[1]) <= $this->sweep[0];
+	}
+
+	/**
+	 * Write the session cookie to the response.
+	 *
+	 * @param  string  $id
+	 * @param  Symfony\Component\HttpFoundation\Response  $response
+	 * @param  Illuminate\CookieCreator  $cookie
+	 * @return void
+	 */
+	protected function writeCookie($id, $response, $cookie)
+	{
+		$name = $this->getCookieName();
+
+		$response->headers->setCookie($cookie->make($name, $id));
 	}
 
 	/**

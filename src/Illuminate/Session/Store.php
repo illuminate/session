@@ -106,9 +106,9 @@ abstract class Store implements TokenProvider, ArrayAccess {
 			$session = $this->createFreshSession();
 		}
 
-		// Once the session payload has been created or loaded we will set it to an
-		// internal value that is managed by the driver. The values aren't sent
-		// back into storage until the session is closed after this requests.
+		// Once the session payloads have been created or loaded we will set it to an
+		// internal values that are managed by the driver. The values are not sent
+		// back into storage until the sessions are closed after these requests.
 		$this->session = $session;
 	}
 

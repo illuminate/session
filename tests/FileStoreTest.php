@@ -1,6 +1,8 @@
 <?php
 
 use Mockery as m;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class FileStoreTest extends PHPUnit_Framework_TestCase {
 
@@ -9,13 +11,43 @@ class FileStoreTest extends PHPUnit_Framework_TestCase {
 		m::close();
 	}
 
-	/**
-	 * @expectedException InvalidArgumentException
-	 */
-	public function testStoreRequiresFileStoreCache()
+
+	public function testRetrieveSessionReturnsFileWhenItExists()
 	{
-		$cache = new Illuminate\Cache\ArrayStore;
-		$files = new Illuminate\Session\FileStore($cache);
+		$files = m::mock('Illuminate\Filesystem');
+		$files->shouldReceive('exists')->once()->with(__DIR__.'/foo')->andReturn(true);
+		$files->shouldReceive('get')->once()->with(__DIR__.'/foo')->andReturn(serialize('hello'));
+		$store = new Illuminate\Session\FileStore($files, __DIR__);
+
+		$this->assertEquals('hello', $store->retrieveSession('foo', new Request));
+	}
+
+
+	public function testRetrieveSessionReturnsNullWhenItDoesntExist()
+	{
+		$files = m::mock('Illuminate\Filesystem');
+		$files->shouldReceive('exists')->once()->with(__DIR__.'/foo')->andReturn(false);
+		$store = new Illuminate\Session\FileStore($files, __DIR__);
+
+		$this->assertNull($store->retrieveSession('foo', new Request));
+	}
+
+
+	public function testCreateSessionStoresSessionInProperPath()
+	{
+		$files = m::mock('Illuminate\Filesystem');
+		$files->shouldReceive('put')->once()->with(__DIR__.'/foo', serialize(array('foo')));
+		$store = new Illuminate\Session\FileStore($files, __DIR__);
+		$store->createSession('foo', array('foo'), new Response);
+	}
+
+
+	public function testUpdateSessionStoresSessionInProperPath()
+	{
+		$files = m::mock('Illuminate\Filesystem');
+		$files->shouldReceive('put')->once()->with(__DIR__.'/foo', serialize(array('foo')));
+		$store = new Illuminate\Session\FileStore($files, __DIR__);
+		$store->updateSession('foo', array('foo'), new Response);
 	}
 
 
@@ -23,8 +55,7 @@ class FileStoreTest extends PHPUnit_Framework_TestCase {
 	{
 		$mock = m::mock('Illuminate\Filesystem');
 
-		$cache = new Illuminate\Cache\FileStore($mock, __DIR__);
-		$store = new Illuminate\Session\FileStore($cache);
+		$store = new Illuminate\Session\FileStore($mock, __DIR__);
 
 		$files = array(__DIR__.'/foo.txt', __DIR__.'/bar.txt');
 

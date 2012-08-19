@@ -197,7 +197,7 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 		$stub->setSession($this->dummySession());
 		$stub->expects($this->any())->method('getCurrentTime')->will($this->returnValue(1));
 		$stub->expects($this->once())->method('sweep')->with($this->equalTo(1 - (120 * 60)));
-		$stub->setSweepLottery(100, 100);
+		$stub->setSweepLottery(array(100, 100));
 		$stub->finish(new Symfony\Component\HttpFoundation\Response, new Illuminate\CookieCreator);
 	}
 
@@ -208,7 +208,7 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 		$stub->setSession($this->dummySession());
 		$stub->expects($this->any())->method('getCurrentTime')->will($this->returnValue(1));
 		$stub->expects($this->never())->method('sweep');
-		$stub->setSweepLottery(0, 100);
+		$stub->setSweepLottery(array(0, 100));
 		$stub->finish(new Symfony\Component\HttpFoundation\Response, new Illuminate\CookieCreator);	
 	}
 

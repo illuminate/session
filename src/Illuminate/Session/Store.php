@@ -569,13 +569,12 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	/**
 	 * Set the chances of hitting the Sweeper lottery.
 	 *
-	 * @param  int   $chance
-	 * @param  int   $out_of
+	 * @param  array  $values
 	 * @return void
 	 */
-	public function setSweepLottery($chance, $out_of)
+	public function setSweepLottery(array $values)
 	{
-		$this->sweep = array($chance, $out_of);
+		$this->sweep = $values;
 	}
 
 	/**

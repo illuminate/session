@@ -231,7 +231,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	 */
 	public function getOldInput($key = null, $default = null)
 	{
-		$input = $this->get('__old_input');
+		$input = $this->get('__old_input', array());
 
 		// Input that is flashed to the session can be easily retrieved by the
 		// developer, making repopulating old forms and the like much more

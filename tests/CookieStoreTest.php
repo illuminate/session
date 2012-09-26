@@ -1,18 +1,27 @@
 <?php
 
+use Mockery as m;
 use Illuminate\Encrypter;
+use Illuminate\CookieJar;
 use Illuminate\Session\CookieStore;
 use Symfony\Component\HttpFoundation\Request;
 
 class CookieStoreTest extends PHPUnit_Framework_TestCase {
 
+	public function tearDown()
+	{
+		m::close();
+	}
+
+
 	public function testRetrieveSessionProperlyDecryptsCookie()
 	{
 		$encrypter = new Encrypter('key', MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC);
-		$store = new CookieStore($encrypter, new Illuminate\CookieCreator);
+		$store = new CookieStore($encrypter, $cookies = m::mock('Illuminate\CookieJar'));
 		$session = $encrypter->encrypt(serialize($expect = array('id' => '1', 'data' => array('foo' => 'bar'), 'last_activity' => '9999999999')));
-		$request = Request::create('/', 'GET', array(), array('illuminate_session' => 1, 'illuminate_payload' => $session));
-		$store->start($request);
+		$cookies->shouldReceive('get')->once()->with('illuminate_session')->andReturn(1);
+		$cookies->shouldReceive('get')->once()->with('illuminate_payload')->andReturn($session);
+		$store->start($cookies);
 		$this->assertEquals($expect, $store->getSession());
 	}
 
@@ -20,7 +29,7 @@ class CookieStoreTest extends PHPUnit_Framework_TestCase {
 	public function testCreateSessionStoresCookiePayload()
 	{
 		$encrypter = new Encrypter('key', MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC);
-		$cookie = new Illuminate\CookieCreator;
+		$cookie = $this->getCookieJar();
 		$store = new Illuminate\Session\CookieStore($encrypter, $cookie);
 		$session = array('id' => '1', 'data' => array(':old:' => array(), ':new:' => array()));
 		$store->setSession($session);
@@ -30,19 +39,19 @@ class CookieStoreTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertTrue(count($response->headers->getCookies()) == 2);
 		$cookies = $response->headers->getCookies();
-		$value = unserialize($encrypter->decrypt($cookies[0]->getValue()));
+		$value = unserialize($encrypter->decrypt($cookie->parse($cookies[0]->getValue())));
 	}
 
 
 	public function testUpdateSessionCallsCreateSession()
 	{
 		$encrypter = new Encrypter(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC, 'key');
-		$store = $this->storeMock(array('createSession'), 'Illuminate\Session\CookieStore', array($encrypter, new Illuminate\CookieCreator));
+		$store = $this->storeMock(array('createSession'), 'Illuminate\Session\CookieStore', array($encrypter, $this->getCookieJar()));
 		$session = array('id' => '1', 'data' => array(':old:' => array(), ':new:' => array()));
 		$store->setSession($session);
 		$store->expects($this->once())->method('createSession');
 		$store->setExists(true);
-		$store->finish($response = new Symfony\Component\HttpFoundation\Response, new Illuminate\CookieCreator);
+		$store->finish($response = new Symfony\Component\HttpFoundation\Response, $this->getCookieJar());
 	}
 
 
@@ -55,6 +64,12 @@ class CookieStoreTest extends PHPUnit_Framework_TestCase {
 	protected function storeMock($stub = array(), $class = 'Illuminate\Session\Store', $constructor = null)
 	{
 		return $this->getMock($class, $stub, $constructor);
+	}
+
+
+	protected function getCookieJar()
+	{
+		return new Illuminate\CookieJar(Request::create('/foo', 'GET'), 'foo-bar', array('path' => '/', 'domain' => 'foo.com', 'secure' => true, 'httpOnly' => true));
 	}
 
 }

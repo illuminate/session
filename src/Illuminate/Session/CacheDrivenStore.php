@@ -1,6 +1,5 @@
 <?php namespace Illuminate\Session;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class CacheDrivenStore extends Store {
@@ -27,10 +26,9 @@ class CacheDrivenStore extends Store {
 	 * Retrieve a session payload from storage.
 	 *
 	 * @param  string  $id
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
 	 * @return array|null
 	 */
-	public function retrieveSession($id, Request $request)
+	public function retrieveSession($id)
 	{
 		return $this->cache->get($id);
 	}

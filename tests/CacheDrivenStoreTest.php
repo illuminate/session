@@ -1,6 +1,5 @@
 <?php
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class CacheDrivenStoreTest extends PHPUnit_Framework_TestCase {
@@ -10,7 +9,7 @@ class CacheDrivenStoreTest extends PHPUnit_Framework_TestCase {
 		$cache = $this->getCacheMock();
 		$store = new Illuminate\Session\CacheDrivenStore($cache);
 		$cache->expects($this->once())->method('get')->with($this->equalTo('foo'))->will($this->returnValue('bar'));
-		$this->assertEquals('bar', $store->retrieveSession('foo', Request::create('/')));
+		$this->assertEquals('bar', $store->retrieveSession('foo'));
 	}
 
 

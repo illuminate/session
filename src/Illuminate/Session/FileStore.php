@@ -1,7 +1,6 @@
 <?php namespace Illuminate\Session;
 
 use Illuminate\Filesystem;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class FileStore extends Store implements Sweeper {
@@ -36,10 +35,9 @@ class FileStore extends Store implements Sweeper {
 	 * Retrieve a session payload from storage.
 	 *
 	 * @param  string  $id
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
 	 * @return array|null
 	 */
-	public function retrieveSession($id, Request $request)
+	public function retrieveSession($id)
 	{
 		if ($this->files->exists($path = $this->getFilePath($id)))
 		{

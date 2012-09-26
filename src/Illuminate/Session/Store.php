@@ -2,7 +2,7 @@
 
 use Closure;
 use ArrayAccess;
-use Illuminate\CookieCreator;
+use Illuminate\CookieJar;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -53,10 +53,9 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	 * Retrieve a session payload from storage.
 	 *
 	 * @param  string  $id
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
 	 * @return array|null
 	 */
-	abstract public function retrieveSession($id, Request $request);
+	abstract public function retrieveSession($id);
 
 	/**
 	 * Create a new session in storage.
@@ -81,19 +80,19 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	/**
 	 * Load the session for the request.
 	 *
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
+	 * @param  Illuminate\CookieJar  $cookies
 	 * @return void
 	 */
-	public function start(Request $request)
+	public function start(CookieJar $cookies)
 	{
-		$id = $request->cookies->get($this->getCookieName());
+		$id = $cookies->get($this->getCookieName());
 
 		// If the session ID was available via the request cookies we'll just retrieve
 		// the session payload from the driver and check the given session to make
 		// sure it's valid. All the data fetching is implemented by the driver.
 		if ( ! is_null($id))
 		{
-			$session = $this->retrieveSession($id, $request);
+			$session = $this->retrieveSession($id);
 		}
 
 		// If the session is not valid, we will create a new payload and will indicate
@@ -360,10 +359,10 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	 * Finish the session handling for the request.
 	 *
 	 * @param  Symfony\Component\HttpFoundation\Response  $response
-	 * @param  Illuminate\CookieCreator  $cookie
+	 * @param  Illuminate\CookieJar  $cookie
 	 * @return void
 	 */
-	public function finish(Response $response, CookieCreator $cookie)
+	public function finish(Response $response, CookieJar $cookie)
 	{
 		$time = $this->getCurrentTime();
 
@@ -436,7 +435,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	 *
 	 * @param  string  $id
 	 * @param  Symfony\Component\HttpFoundation\Response  $response
-	 * @param  Illuminate\CookieCreator  $cookie
+	 * @param  Illuminate\Jar  $cookie
 	 * @return void
 	 */
 	protected function writeCookie($id, $response, $cookie)

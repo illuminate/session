@@ -16,7 +16,7 @@ class CookieStore extends Store {
 	/**
 	 * The Illuminate cookie creator.
 	 *
-	 * @var Illuminate\CookieCreator
+	 * @var Illuminate\CookieJar
 	 */
 	protected $cookies;
 

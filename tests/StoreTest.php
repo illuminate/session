@@ -165,7 +165,7 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 		$session['data'] = array(':old:' => array('baz' => 'boom'), ':new:' => array());
 		$store->expects($this->once())->method('updateSession')->with($this->equalTo('1'), $this->equalTo($session));
 		$response = new Response;
-		$cookie = $this->getCookieJar();
+		$cookie = $this->getCookieJarMock();
 		$store->finish($response, $cookie);
 	}
 
@@ -180,7 +180,7 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 		$store->expects($this->once())->method('createSession')->with($this->equalTo('1'), $this->equalTo($session));
 		$store->setExists(false);
 		$response = new Response;
-		$cookie = $this->getCookieJar();
+		$cookie = $this->getCookieJarMock();
 		$store->finish($response, $cookie);	
 	}
 
@@ -190,16 +190,13 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 		$store = $this->storeMock('getCurrentTime');
 		$store->setSession($session = array('id' => '1', 'data' => array(':old:' => array('foo' => 'bar'), ':new:' => array('baz' => 'boom'))));
 		$response = new Response;
-		$cookieJar = $this->getCookieJar();
+		$cookieJar = $this->getCookieJarMock();
 		$store->finish($response, $cookieJar);
 
 		$cookies = $response->headers->getCookies();
 		$this->assertTrue(count($cookies) === 1);
 		$cookie = $cookies[0];
-		$this->assertEquals($cookieJar->hash('1').'+1', $cookie->getValue());
-		$this->assertEquals('foo.com', $cookie->getDomain());
-		$this->assertEquals('//', $cookie->getPath());
-		$this->assertEquals('illuminate_session', $cookie->getName());
+		$this->assertEquals('bar', $cookie->getValue());
 	}
 
 
@@ -210,7 +207,7 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 		$stub->expects($this->any())->method('getCurrentTime')->will($this->returnValue(1));
 		$stub->expects($this->once())->method('sweep')->with($this->equalTo(1 - (120 * 60)));
 		$stub->setSweepLottery(array(100, 100));
-		$stub->finish(new Symfony\Component\HttpFoundation\Response, $this->getCookieJar());
+		$stub->finish(new Symfony\Component\HttpFoundation\Response, $this->getCookieJarMock());
 	}
 
 
@@ -221,7 +218,7 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 		$stub->expects($this->any())->method('getCurrentTime')->will($this->returnValue(1));
 		$stub->expects($this->never())->method('sweep');
 		$stub->setSweepLottery(array(0, 100));
-		$stub->finish(new Symfony\Component\HttpFoundation\Response, $this->getCookieJar());
+		$stub->finish(new Symfony\Component\HttpFoundation\Response, $this->getCookieJarMock());
 	}
 
 
@@ -252,9 +249,17 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	protected function getCookieJarMock()
+	{
+		$mock = m::mock('Illuminate\CookieJar');
+		$mock->shouldReceive('make')->andReturn(new Symfony\Component\HttpFoundation\Cookie('foo', 'bar'));
+		return $mock;
+	}
+
+
 	protected function getCookieJar()
 	{
-		return new Illuminate\CookieJar(Request::create('/foo', 'GET'), 'foo-bar', array('path' => '//', 'domain' => 'foo.com', 'secure' => false, 'httpOnly' => false));
+		return new Illuminate\CookieJar(Request::create('/foo', 'GET'), m::mock('Illuminate\Encrypter'), array('path' => '//', 'domain' => 'foo.com', 'secure' => false, 'httpOnly' => false));
 	}
 
 }

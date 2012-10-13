@@ -1,17 +1,9 @@
 <?php namespace Illuminate\Session;
 
-use Illuminate\Encrypter;
 use Illuminate\CookieJar;
 use Symfony\Component\HttpFoundation\Response;
 
 class CookieStore extends Store {
-
-	/**
-	 * The Illuminate encrypter instance.
-	 *
-	 * @var Illuminate\Encrypter
-	 */
-	protected $encrypter;
 
 	/**
 	 * The Illuminate cookie creator.
@@ -30,14 +22,12 @@ class CookieStore extends Store {
 	/**
 	 * Create a new Cookie based session store.
 	 *
-	 * @param  Illuminate\Encrypter  $encrypter
 	 * @param  Illuminate\CookieJar  $cookies
 	 * @return void
 	 */
-	public function __construct(Encrypter $encrypter, CookieJar $cookies)
+	public function __construct(CookieJar $cookies)
 	{
 		$this->cookies = $cookies;
-		$this->encrypter = $encrypter;
 	}
 
 	/**
@@ -48,12 +38,7 @@ class CookieStore extends Store {
 	 */
 	public function retrieveSession($id)
 	{
-		$value = $this->cookies->get($this->payload);
-
-		if ( ! is_null($value))
-		{
-			return @unserialize($this->encrypter->decrypt($value));
-		}
+		return unserialize($this->cookies->get($this->payload));
 	}
 
 	/**
@@ -66,7 +51,7 @@ class CookieStore extends Store {
 	 */
 	public function createSession($id, array $session, Response $response)
 	{
-		$value = $this->encrypter->encrypt(serialize($session));
+		$value = serialize($session);
 
 		$response->headers->setCookie($this->cookies->make($this->payload, $value));
 	}

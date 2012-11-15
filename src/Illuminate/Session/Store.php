@@ -348,7 +348,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	 *
 	 * @return string
 	 */
-	public function regenerateSession()
+	public function regenerate()
 	{
 		$this->exists = false;
 

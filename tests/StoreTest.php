@@ -149,7 +149,7 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 	{
 		$store = $this->storeMock();
 		$store->setSession(array('id' => '1'));
-		$store->regenerateSession();
+		$store->regenerate();
 		$session = $store->getSession();
 		$this->assertTrue(strlen($session['id']) == 40);
 		$this->assertFalse($store->sessionExists());

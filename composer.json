@@ -14,6 +14,7 @@
         "illuminate/database": ">=1.0.0",
         "illuminate/encryption": ">=1.0.0",
         "illuminate/filesystem": ">=1.0.0",
+        "illuminate/support": ">=1.0.0",
         "symfony/http-foundation": ">=2.0.0"
     },
     "require-dev": {

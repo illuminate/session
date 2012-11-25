@@ -7,49 +7,53 @@ class SessionServiceProvider extends ServiceProvider {
 	/**
 	 * Bootstrap the application events.
 	 *
-	 * @param  Illuminate\Foundation\Application  $app
 	 * @return void
 	 */
-	public function boot($app)
+	public function boot()
 	{
-		$this->registerSessionEvents($app);
+		$this->registerSessionEvents();
 	}
 
 	/**
 	 * Register the service provider.
 	 *
-	 * @param  Illuminate\Foundation\Application  $app
 	 * @return void
 	 */
-	public function register($app)
+	public function register()
 	{
-		$app['session'] = $app->share(function($app)
+		$this->addSessionFilter($app);
+
+		$this->app['session'] = $this->app->share(function($app)
 		{
+			// First, we will create the session manager which is responsible for the
+			// creation of the various session drivers when they are needed by the
+			// application instance, and will resolve them on a lazy load basis.
 			$manager = new SessionManager($app);
 
 			$driver = $manager->driver();
 
+			$config = $app['config']['session'];
+
 			// Once we get an instance of the session driver, we need to set a few of
 			// the session options based on the application configuration, such as
 			// the session lifetime and the sweeper lottery configuration value.
-			$driver->setLifetime($app['config']['session.lifetime']);
+			$driver->setLifetime($config['lifetime']);
 
-			$driver->setSweepLottery($app['config']['session.lottery']);
+			$driver->setSweepLottery($config['lottery']);
 
 			return $driver;
 		});
-
-		$this->addSessionFilter($app);
 	}
 
 	/**
 	 * Register the events needed for session management.
 	 *
-	 * @param  Illuminate\Foundation\Application  $app
 	 * @return void
 	 */
-	protected function registerSessionEvents($app)
+	protected function registerSessionEvents()
 	{
+		$app = $this->app;
+
 		// The session needs to be started and closed, so we will register a before
 		// and after event to do all that for us. This will manage the loading
 		// the session payloads as well as writing them after each request.
@@ -67,11 +71,12 @@ class SessionServiceProvider extends ServiceProvider {
 	/**
 	 * Register the CSRF filter for the application.
 	 *
-	 * @param  Illuminate\Foundation\Application  $app
 	 * @return void
 	 */
-	protected function addSessionFilter($app)
+	protected function addSessionFilter()
 	{
+		$app = $this->app;
+
 		$app->addFilter('csrf', function() use ($app)
 		{
 			// The "csrf" middleware provides a simple middleware for checking that a

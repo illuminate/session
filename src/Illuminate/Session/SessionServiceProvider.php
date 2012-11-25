@@ -21,7 +21,7 @@ class SessionServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->addSessionFilter($app);
+		$this->addSessionFilter();
 
 		$this->app['session'] = $this->app->share(function($app)
 		{

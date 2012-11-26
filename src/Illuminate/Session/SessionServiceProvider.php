@@ -77,7 +77,7 @@ class SessionServiceProvider extends ServiceProvider {
 	{
 		$app = $this->app;
 
-		$app->addFilter('csrf', function() use ($app)
+		$app['router']->addFilter('csrf', function() use ($app)
 		{
 			// The "csrf" middleware provides a simple middleware for checking that a
 			// CSRF token in the request inputs matches the CSRF token stored for

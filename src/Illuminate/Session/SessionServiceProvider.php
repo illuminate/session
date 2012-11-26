@@ -21,8 +21,6 @@ class SessionServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->addSessionFilter();
-
 		$this->app['session'] = $this->app->share(function($app)
 		{
 			// First, we will create the session manager which is responsible for the
@@ -65,29 +63,6 @@ class SessionServiceProvider extends ServiceProvider {
 		$app->close(function($request, $response) use ($app)
 		{
 			$app['session']->finish($response, $app['cookie']);
-		});
-	}
-
-	/**
-	 * Register the CSRF filter for the application.
-	 *
-	 * @return void
-	 */
-	protected function addSessionFilter()
-	{
-		$app = $this->app;
-
-		$app['router']->addFilter('csrf', function() use ($app)
-		{
-			// The "csrf" middleware provides a simple middleware for checking that a
-			// CSRF token in the request inputs matches the CSRF token stored for
-			// the user in the session data. If it doesn't, we will bail out.
-			$token = $app['session']->getToken();
-
-			if ($token !== $app['request']->get('csrf_token'))
-			{
-				throw new TokenMismatchException;
-			}
 		});
 	}
 

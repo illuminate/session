@@ -52,18 +52,23 @@ class SessionServiceProvider extends ServiceProvider {
 	{
 		$app = $this->app;
 
-		// The session needs to be started and closed, so we will register a before
-		// and after event to do all that for us. This will manage the loading
-		// the session payloads as well as writing them after each request.
-		$app->before(function($request) use ($app)
-		{
-			$app['session']->start($app['cookie']);
-		});
+		$driver = $app['config']['session.driver'];
 
-		$app->close(function($request, $response) use ($app)
+		// The session needs to be started and closed, so we will register a before
+		// and after events to do all stuff for us. This will manage the loading
+		// the session "payloads", as well as writing them after each request.
+		if ( ! is_null($driver))
 		{
-			$app['session']->finish($response, $app['cookie']);
-		});
+			$app->before(function($request) use ($app)
+			{
+				$app['session']->start($app['cookie']);
+			});
+
+			$app->close(function($request, $response) use ($app)
+			{
+				$app['session']->finish($response, $app['cookie']);
+			});
+		}
 	}
 
 }

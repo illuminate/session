@@ -360,9 +360,10 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	 *
 	 * @param  Symfony\Component\HttpFoundation\Response  $response
 	 * @param  Illuminate\CookieJar  $cookie
+	 * @param  int  $lifetime
 	 * @return void
 	 */
-	public function finish(Response $response, CookieJar $cookie)
+	public function finish(Response $response, CookieJar $cookie, $lifetime)
 	{
 		$time = $this->getCurrentTime();
 
@@ -395,7 +396,7 @@ abstract class Store implements TokenProvider, ArrayAccess {
 			$this->sweep($time - ($this->lifetime * 60));
 		}
 
-		$this->writeCookie($id, $response, $cookie);
+		$this->writeCookie($id, $response, $cookie, $lifetime);
 	}
 
 	/**
@@ -436,13 +437,14 @@ abstract class Store implements TokenProvider, ArrayAccess {
 	 * @param  string  $id
 	 * @param  Symfony\Component\HttpFoundation\Response  $response
 	 * @param  Illuminate\Jar  $cookie
+	 * @param  int  $lifetime
 	 * @return void
 	 */
-	protected function writeCookie($id, $response, $cookie)
+	protected function writeCookie($id, $response, $cookie, $lifetime)
 	{
 		$name = $this->getCookieName();
 
-		$response->headers->setCookie($cookie->make($name, $id));
+		$response->headers->setCookie($cookie->make($name, $id, $lifetime));
 	}
 
 	/**

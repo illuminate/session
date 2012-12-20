@@ -166,7 +166,7 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 		$store->expects($this->once())->method('updateSession')->with($this->equalTo('1'), $this->equalTo($session));
 		$response = new Response;
 		$cookie = $this->getCookieJarMock();
-		$store->finish($response, $cookie);
+		$store->finish($response, $cookie, 0);
 	}
 
 
@@ -181,7 +181,7 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 		$store->setExists(false);
 		$response = new Response;
 		$cookie = $this->getCookieJarMock();
-		$store->finish($response, $cookie);	
+		$store->finish($response, $cookie, 0);	
 	}
 
 
@@ -191,7 +191,7 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 		$store->setSession($session = array('id' => '1', 'data' => array(':old:' => array('foo' => 'bar'), ':new:' => array('baz' => 'boom'))));
 		$response = new Response;
 		$cookieJar = $this->getCookieJarMock();
-		$store->finish($response, $cookieJar);
+		$store->finish($response, $cookieJar, 0);
 
 		$cookies = $response->headers->getCookies();
 		$this->assertTrue(count($cookies) === 1);
@@ -207,7 +207,7 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 		$stub->expects($this->any())->method('getCurrentTime')->will($this->returnValue(1));
 		$stub->expects($this->once())->method('sweep')->with($this->equalTo(1 - (120 * 60)));
 		$stub->setSweepLottery(array(100, 100));
-		$stub->finish(new Symfony\Component\HttpFoundation\Response, $this->getCookieJarMock());
+		$stub->finish(new Symfony\Component\HttpFoundation\Response, $this->getCookieJarMock(), 0);
 	}
 
 
@@ -218,7 +218,7 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 		$stub->expects($this->any())->method('getCurrentTime')->will($this->returnValue(1));
 		$stub->expects($this->never())->method('sweep');
 		$stub->setSweepLottery(array(0, 100));
-		$stub->finish(new Symfony\Component\HttpFoundation\Response, $this->getCookieJarMock());
+		$stub->finish(new Symfony\Component\HttpFoundation\Response, $this->getCookieJarMock(), 0);
 	}
 
 

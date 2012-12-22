@@ -15,7 +15,7 @@
         "illuminate/encryption": "1.2.*",
         "illuminate/filesystem": "1.2.*",
         "illuminate/support": "1.2.*",
-        "symfony/http-foundation": "2.1.*"
+        "symfony/http-foundation": "2.2.*"
     },
     "require-dev": {
         "mockery/mockery": ">=0.7.2"

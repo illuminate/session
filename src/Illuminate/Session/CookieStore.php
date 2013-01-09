@@ -70,14 +70,14 @@ class CookieStore extends Store {
 	}
 
 	/**
-	 * Set the name of the sessoin payload cookie.
+	 * Set the name of the session payload cookie.
 	 *
 	 * @param  string  $name
 	 * @return void
 	 */
 	public function setPayloadName($name)
 	{
-		$this->paylaod = $name;
+		$this->payload = $name;
 	}
 
 	/**
